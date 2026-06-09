@@ -1,0 +1,187 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:black;
+    overflow:hidden;
+    transition:0.5s;
+}
+
+/* Animated Stars Background */
+
+body::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:
+    radial-gradient(white 1px, transparent 1px),
+    radial-gradient(cyan 1px, transparent 1px);
+    background-size:50px 50px;
+    background-position:0 0,25px 25px;
+    animation:stars 5s linear infinite;
+    opacity:0.5;
+}
+
+@keyframes stars{
+    from{
+        transform:translateY(0);
+    }
+    to{
+        transform:translateY(50px);
+    }
+}
+
+/* Main Container */
+
+.chat-container{
+    position:relative;
+    width:800px;
+    max-height:90vh;
+    overflow-y:auto;
+
+    padding:30px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,0.05);
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:0 0 30px cyan;
+
+    text-align:center;
+
+    z-index:1;
+}
+
+/* Heading */
+
+h1{
+    color:white;
+    margin-bottom:25px;
+    text-shadow:0 0 15px cyan;
+    font-size:55px;
+}
+
+/* Input & Select */
+
+input,
+select{
+    width:100%;
+    padding:18px;
+    border:none;
+    border-radius:15px;
+    outline:none;
+    font-size:18px;
+    margin-bottom:18px;
+}
+
+/* Buttons */
+
+.btns{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:20px;
+}
+
+button{
+    padding:14px 25px;
+    border:none;
+    border-radius:15px;
+    background:cyan;
+    color:black;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+    background:white;
+}
+
+/* AI Response Box */
+
+.reply-box{
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    text-align:left;
+    min-height:150px;
+    margin-top:15px;
+}
+
+.reply-box h3{
+    margin-bottom:15px;
+    color:darkblue;
+    font-size:22px;
+}
+
+.reply-box p{
+    font-size:18px;
+    line-height:1.6;
+}
+
+/* Chat History */
+
+.history-box{
+    margin-top:20px;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    max-height:300px;
+    overflow-y:auto;
+    text-align:left;
+}
+
+.history-box h3{
+    margin-bottom:15px;
+    color:darkblue;
+    font-size:22px;
+}
+
+.history-box pre{
+    white-space:pre-wrap;
+    font-size:18px;
+    line-height:1.5;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:cyan;
+    border-radius:10px;
+}
+
+/* Mobile Responsive */
+
+@media(max-width:900px){
+
+    .chat-container{
+        width:95%;
+    }
+
+    h1{
+        font-size:40px;
+    }
+
+    button{
+        width:100%;
+    }
+}

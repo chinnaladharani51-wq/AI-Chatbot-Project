@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chatbot</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, sans-serif;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:black;
+            overflow:hidden;
+            transition:0.5s;
+        }
+
+        body::before{
+            content:"";
+            position:absolute;
+            width:100%;
+            height:100%;
+            background:
+            radial-gradient(white 1px, transparent 1px),
+            radial-gradient(cyan 1px, transparent 1px);
+
+            background-size:50px 50px;
+            background-position:0 0,25px 25px;
+
+            animation:stars 5s linear infinite;
+            opacity:0.5;
+        }
+
+        @keyframes stars{
+            from{
+                transform:translateY(0);
+            }
+            to{
+                transform:translateY(50px);
+            }
+        }
+
+        .chat-container{
+            position:relative;
+            width:650px;
+            max-height:90vh;
+            overflow-y:auto;
+
+            padding:30px;
+
+            border-radius:25px;
+
+            background:rgba(255,255,255,0.08);
+
+            backdrop-filter:blur(10px);
+
+            box-shadow:0 0 30px cyan;
+
+            text-align:center;
+
+            z-index:1;
+        }
+
+        h1{
+            color:white;
+            margin-bottom:20px;
+            text-shadow:0 0 15px cyan;
+        }
+
+        input,
+        select{
+            width:100%;
+            padding:15px;
+            border:none;
+            border-radius:12px;
+            outline:none;
+            font-size:16px;
+            margin-bottom:15px;
+        }
+
+        .btns{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            justify-content:center;
+            margin-bottom:20px;
+        }
+
+        button{
+            padding:12px 20px;
+            border:none;
+            border-radius:12px;
+            background:cyan;
+            color:black;
+            font-size:15px;
+            font-weight:bold;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        button:hover{
+            transform:scale(1.05);
+            background:white;
+        }
+
+        .reply-box{
+            background:white;
+            padding:20px;
+            border-radius:15px;
+            text-align:left;
+            min-height:120px;
+            margin-top:15px;
+        }
+
+        .reply-box h3{
+            margin-bottom:10px;
+            color:darkblue;
+        }
+
+        .history-box{
+            margin-top:15px;
+            background:white;
+            padding:15px;
+            border-radius:15px;
+            max-height:250px;
+            overflow-y:auto;
+            text-align:left;
+        }
+
+        .history-box h3{
+            margin-bottom:10px;
+            color:darkblue;
+        }
+
+        .history-box pre{
+            white-space:pre-wrap;
+            font-size:14px;
+        }
+
+        ::-webkit-scrollbar{
+            width:8px;
+        }
+
+        ::-webkit-scrollbar-thumb{
+            background:cyan;
+            border-radius:10px;
+        }
+
+        @media(max-width:700px){
+
+            .chat-container{
+                width:95%;
+            }
+
+            button{
+                width:100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <h1>🤖 AI Chatbot</h1>
+
+    <form method="POST">
+
+        <select name="language">
+            <option value="English">English</option>
+            <option value="Telugu">Telugu</option>
+            <option value="Hindi">Hindi</option>
+            <option value="Tamil">Tamil</option>
+        </select>
+
+        <input
+            type="text"
+            id="message"
+            name="message"
+            placeholder="Ask anything..."
+            required
+        >
+
+        <div class="btns">
+
+            <button type="button" onclick="startVoice()">
+                🎤 Voice
+            </button>
+
+            <button type="submit">
+                Send
+            </button>
+
+            <button type="button" onclick="clearChat()">
+                🗑 Clear
+            </button>
+
+            <button type="button" onclick="toggleTheme()">
+                🌙 Theme
+            </button>
+
+        </div>
+
+    </form>
+
+    <div class="reply-box">
+
+        <h3>🤖 AI Response</h3>
+
+        <p id="replyText">{{ reply }}</p>
+
+    </div>
+
+    <div class="history-box">
+
+        <h3>📜 Previous Chat History</h3>
+
+        <pre>{{ history }}</pre>
+
+    </div>
+
+</div>
+
+<script>
+
+function startVoice(){
+
+    if(!('webkitSpeechRecognition' in window)){
+
+        alert("Voice recognition not supported");
+
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+
+    recognition.lang = "en-US";
+
+    recognition.start();
+
+    recognition.onresult = function(event){
+
+        document.getElementById("message").value =
+        event.results[0][0].transcript;
+    };
+}
+
+function speakText(text){
+
+    let speech = new SpeechSynthesisUtterance(text);
+
+    speech.lang = "en-US";
+
+    window.speechSynthesis.speak(speech);
+}
+
+function clearChat(){
+
+    document.getElementById("message").value="";
+
+    document.getElementById("replyText").innerHTML="";
+}
+
+function toggleTheme(){
+
+    if(document.body.style.background=="white"){
+
+        document.body.style.background="black";
+
+    }
+    else{
+
+        document.body.style.background="white";
+    }
+}
+
+</script>
+
+{% if reply %}
+<script>
+speakText(`{{ reply }}`);
+</script>
+{% endif %}
+
+</body>
+</html>
