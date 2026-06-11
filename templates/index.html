@@ -255,14 +255,24 @@ function startVoice(){
     };
 }
 
+/* Voice Output */
+
 function speakText(text){
 
     let speech = new SpeechSynthesisUtterance(text);
 
     speech.lang = "en-US";
 
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+    speech.volume = 1;
+
     window.speechSynthesis.speak(speech);
 }
+
+/* Clear Chat */
 
 function clearChat(){
 
@@ -270,6 +280,8 @@ function clearChat(){
 
     document.getElementById("replyText").innerHTML="";
 }
+
+/* Theme Toggle */
 
 function toggleTheme(){
 
@@ -288,7 +300,9 @@ function toggleTheme(){
 
 {% if reply %}
 <script>
+
 speakText(`{{ reply }}`);
+
 </script>
 {% endif %}
 
