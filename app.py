@@ -1,9 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for
 import requests
+<<<<<<< HEAD
+import os
+
+app = Flask(__name__)
+
+# Get API Key from Environment Variable
+API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+=======
 
 app = Flask(__name__)
 
 API_KEY = ""
+>>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
 
 # =========================
 # REGISTER
@@ -45,7 +55,10 @@ def login():
                     user, pwd = line.strip().split(",")
 
                     if username == user and password == pwd:
+<<<<<<< HEAD
+=======
 
+>>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
                         return redirect(url_for("home"))
 
         except:
@@ -97,6 +110,13 @@ def home():
             result = response.json()
 
             if "choices" in result:
+<<<<<<< HEAD
+                reply = result["choices"][0]["message"]["content"]
+            else:
+                reply = str(result)
+
+            with open("chat_history.txt", "a", encoding="utf-8") as file:
+=======
 
                 reply = result["choices"][0]["message"]["content"]
 
@@ -106,10 +126,20 @@ def home():
 
             with open("chat_history.txt", "a", encoding="utf-8") as file:
 
+>>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
                 file.write(f"👤 User: {message}\n")
                 file.write(f"🤖 AI: {reply}\n\n")
 
         except Exception as e:
+<<<<<<< HEAD
+            reply = str(e)
+
+    try:
+        with open("chat_history.txt", "r", encoding="utf-8") as file:
+            history = file.read()
+
+    except:
+=======
 
             reply = str(e)
 
@@ -121,6 +151,7 @@ def home():
 
     except:
 
+>>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
         history = ""
 
     return render_template(
