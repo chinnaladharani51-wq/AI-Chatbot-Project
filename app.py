@@ -1,24 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import requests
-<<<<<<< HEAD
 import os
 
 app = Flask(__name__)
+app.secret_key = "chatbot_secret_key"
 
-# Get API Key from Environment Variable
-API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-=======
-
-app = Flask(__name__)
-
-API_KEY = ""
->>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
-
-# =========================
+# ==========================
 # REGISTER
-# =========================
-
+# ==========================
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -27,18 +17,42 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
+        try:
+            with open("users.txt", "r") as file:
+
+                for line in file:
+
+                    line = line.strip()
+
+                    if not line:
+                        continue
+
+                    parts = line.split(",")
+
+                    if len(parts) != 2:
+                        continue
+
+                    user, pwd = parts
+
+                    if user == username:
+                        return "Username already exists!"
+
+        except FileNotFoundError:
+            pass
+
         with open("users.txt", "a") as file:
             file.write(f"{username},{password}\n")
+
+        print("Saved:", username, password)
 
         return redirect(url_for("login"))
 
     return render_template("register.html")
 
 
-# =========================
+# ==========================
 # LOGIN
-# =========================
-
+# ==========================
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -52,16 +66,24 @@ def login():
 
                 for line in file:
 
-                    user, pwd = line.strip().split(",")
+                    line = line.strip()
+
+                    if not line:
+                        continue
+
+                    parts = line.split(",")
+
+                    if len(parts) != 2:
+                        continue
+
+                    user, pwd = parts
 
                     if username == user and password == pwd:
-<<<<<<< HEAD
-=======
 
->>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
+                        session["user"] = username
                         return redirect(url_for("home"))
 
-        except:
+        except FileNotFoundError:
             pass
 
         return "Invalid Username or Password"
@@ -69,12 +91,28 @@ def login():
     return render_template("login.html")
 
 
-# =========================
-# CHATBOT HOME
-# =========================
+# ==========================
+# LOGOUT
+# ==========================
+@app.route("/logout")
+def logout():
 
+    session.clear()
+    return redirect(url_for("login"))
+
+
+# ==========================
+# HOME
+# ==========================
 @app.route("/", methods=["GET", "POST"])
 def home():
+
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    username = session["user"]
+
+    history_file = f"history_{username}.txt"
 
     reply = ""
     history = ""
@@ -84,78 +122,67 @@ def home():
         message = request.form.get("message")
         language = request.form.get("language", "English")
 
-        headers = {
-            "Authorization": f"Bearer {API_KEY}",
-            "Content-Type": "application/json"
-        }
+        api_key = request.form.get("api_key")
 
-        data = {
-            "model": "openai/gpt-3.5-turbo",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": f"Answer in {language}: {message}"
-                }
-            ]
-        }
+        if not api_key:
 
-        try:
+            reply = "Please enter your OpenRouter API Key."
 
-            response = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers=headers,
-                json=data
-            )
+        else:
 
-            result = response.json()
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
 
-            if "choices" in result:
-<<<<<<< HEAD
-                reply = result["choices"][0]["message"]["content"]
-            else:
-                reply = str(result)
+            data = {
+                "model": "openai/gpt-3.5-turbo",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": f"Answer in {language}: {message}"
+                    }
+                ]
+            }
 
-            with open("chat_history.txt", "a", encoding="utf-8") as file:
-=======
+            try:
 
-                reply = result["choices"][0]["message"]["content"]
+                response = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers=headers,
+                    json=data
+                )
 
-            else:
+                result = response.json()
 
-                reply = str(result)
+                if "choices" in result:
 
-            with open("chat_history.txt", "a", encoding="utf-8") as file:
+                    reply = result["choices"][0]["message"]["content"]
 
->>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
-                file.write(f"👤 User: {message}\n")
-                file.write(f"🤖 AI: {reply}\n\n")
+                else:
 
-        except Exception as e:
-<<<<<<< HEAD
-            reply = str(e)
+                    reply = str(result)
 
-    try:
-        with open("chat_history.txt", "r", encoding="utf-8") as file:
-            history = file.read()
+                with open(history_file, "a", encoding="utf-8") as file:
 
-    except:
-=======
+                    file.write(f"👤 {message}\n")
+                    file.write(f"🤖 {reply}\n\n")
 
-            reply = str(e)
+            except Exception as e:
+
+                reply = str(e)
 
     try:
 
-        with open("chat_history.txt", "r", encoding="utf-8") as file:
-
+        with open(history_file, "r", encoding="utf-8") as file:
             history = file.read()
 
-    except:
-
->>>>>>> 67799a718a9c3eed6eccb5276da580dc25d936f9
+    except FileNotFoundError:
         history = ""
 
     return render_template(
         "index.html",
+        username=username,
         reply=reply,
         history=history
     )
